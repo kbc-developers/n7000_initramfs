@@ -19,9 +19,8 @@ on init
     mount /tmp /tmp tmpfs
 
     # override device prop
-    setprop ro.product.device galaxys2
-    setprop ro.build.product galaxys2
-    setprop ro.product.board galaxys2
+    setprop ro.product.device GT-N7000
+    setprop ro.build.product GT-N7000
 
 on fs
     mount tmpfs tmpfs /tmp mode=0755    

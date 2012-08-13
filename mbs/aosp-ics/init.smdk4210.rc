@@ -4,16 +4,16 @@ on early-init
     export SECONDARY_STORAGE /mnt/emmc
     export EXTERNAL_STORAGE /mnt/sdcard
     mkdir /mnt 0775 system system
-    mkdir /mnt/emmc 0775 system system
     mkdir /mnt/sdcard 0775 system system
+    mkdir /mnt/emmc 0775 system system
     mkdir /mnt/usbdisk 0775 system system
     mkdir /efs 0771 radio system
     mkdir /preload 0771 system system
     mkdir /mnt/.lfs 0755 root root
 
     # for backwards compatibility
-    symlink /mnt/emmc /emmc
     symlink /mnt/sdcard /sdcard
+    symlink /mnt/emmc /emmc
 
 # Disable CFQ slice idle delay
     write /sys/block/mmcblk0/queue/iosched/slice_idle 0
@@ -41,6 +41,7 @@ on fs
     symlink /lib/modules/logger.ko /system/lib/modules/logger.ko
     symlink /lib/modules/ntfs.ko /system/lib/modules/ntfs.ko
     symlink /lib/modules/scsi_wait_scan.ko /system/lib/modules/scsi_wait_scan.ko
+    symlink /lib/modules/Si4709_driver.ko /system/lib/modules/Si4709_driver.ko
 
     mount ext4 /dev/block/mmcblk0p7 /cache nosuid nodev noatime wait
     mount ext4 /dev/block/mmcblk0p10 /data nosuid nodev noatime wait noauto_da_alloc
@@ -60,11 +61,11 @@ on fs
 
 on post-fs-data
 # insmod kernel modules
-    insmod /system/lib/modules/j4fs.ko
-    insmod /system/lib/modules/Si4709_driver.ko
+#   insmod /system/lib/modules/Si4709_driver.ko
+#   insmod /lib/modules/j4fs.ko
     
 # mount param.lfs
-    mount j4fs /dev/block/mmcblk0p4 /mnt/.lfs
+#   mount j4fs /dev/block/mmcblk0p4 /mnt/.lfs
 
 # GPS
     chown root system /dev/ttySAC1
@@ -186,7 +187,7 @@ on post-fs-data
 # Permissions for input devices
     chown system radio /sys/devices/virtual/sec/sec_key/sec_key_pressed
 
-    chown system radio /sys/devices/virtual/sec/sec_touchkey/enable_disable
+    chown system radio /sys/devices/virtual/sec/sec_touchkey/force_disable
     chown system radio /sys/devices/virtual/sec/sec_touchkey/recommended_version
     chown system radio /sys/devices/virtual/sec/sec_touchkey/touch_sensitivity
     chown system radio /sys/devices/virtual/sec/sec_touchkey/brightness
@@ -198,6 +199,7 @@ on post-fs-data
     chown system radio /sys/devices/virtual/sec/sec_touchkey/touchkey_firm_update_status
     chown system radio /sys/devices/virtual/sec/sec_touchkey/touchkey_firm_update
     chown system radio /sys/devices/virtual/sec/sec_touchkey/updated_version
+    chown system radio /sys/devices/virtual/sec/sec_touchkey/led_timeout
 
     chown system radio /sys/devices/virtual/sec/tsp_noise_test/set_firm_version
     chown system radio /sys/devices/virtual/sec/tsp_noise_test/set_threshould
@@ -238,19 +240,19 @@ on post-fs-data
 # Vibetonz
     chmod 0660 /dev/tspdrv
     chown root shell /dev/tspdrv
+    chmod 0660 /sys/vibrator/pwm_val
+    chown system system /sys/vibrator/pwm_val
 
 # Permissions for LCD
     chown system radio /sys/class/lcd/panel/lcd_power
     chown system radio /sys/class/lcd/panel/lcd_type
     chown system media_rw /sys/class/lcd/panel/gamma_mode
     chown system media_rw /sys/class/lcd/panel/power_reduce
-    chown system system /sys/class/backlight/panel/auto_brightness
 
 # Permissions for mDNIe
     chown system media_rw /sys/class/mdnie/mdnie/mode
     chown system media_rw /sys/class/mdnie/mdnie/outdoor
     chown system media_rw /sys/class/mdnie/mdnie/scenario
-    chown system media_rw /sys/class/mdnie/mdnie/negative
     write /sys/class/mdnie/mdnie/scenario 4
 
 # Permissions for uart_sel and usb_sel
@@ -283,16 +285,16 @@ on post-fs-data
     write /sys/devices/system/cpu/cpufreq/ondemand/down_differential 5
     write /sys/devices/system/cpu/cpufreq/ondemand/up_threshold 85
 
-#panorama directory creation
-    mkdir /data/pxtmpdir 0775
-    chown system system /data/pxtmpdir
-    chmod 0775 /data/pxtmpdir
-
-# backlight permissions
+on boot
     chown system system /sys/class/backlight/pwm-backlight/brightness
     chmod 0660 /sys/class/backlight/pwm-backlight/brightness
     chown radio system /sys/devices/virtual/misc/melfas_touchkey/brightness
     chmod 0660 /sys/devices/virtual/misc/melfas_touchkey/brightness
+
+#panorama directory creation
+    mkdir /data/pxtmpdir 0775
+    chown system system /data/pxtmpdir
+    chmod 0775 /data/pxtmpdir
 
 # Permissions for dvfs lock
     chown system system /sys/power/cpufreq_max_limit
@@ -300,8 +302,11 @@ on post-fs-data
     chmod 0660 /sys/power/cpufreq_max_limit
     chmod 0660 /sys/power/cpufreq_min_limit
 
-    chown system system /sys/power/gpu_lock
-    chmod 0660 /sys/power/gpu_lock
+    mount debugfs /sys/kernel/debug /sys/kernel/debug
+
+    setprop ro.build.product GT-N7000
+    setprop ro.product.device GT-N7000
+    setprop ro.radio.noril yes
 
 # Permisions for sensors
     chown radio system /sys/devices/virtual/K3G_GYRO-dev/k3g/gyro_selftest
@@ -309,16 +314,6 @@ on post-fs-data
     chown radio system /sys/devices/virtual/K3G_GYRO-dev/k3g/gyro_power_on
     chown radio system /sys/devices/virtual/accelerometer/accelerometer/acc_file
     chown radio system /sys/devices/virtual/sec/gsensorcal/calibration
-
-# for device encryption
-    setprop vold.post_fs_data_done 1
-
-on boot
-    mount debugfs /sys/kernel/debug /sys/kernel/debug
-
-    setprop ro.build.product GT-I9100
-    setprop ro.product.device GT-I9100
-    setprop ro.radio.noril yes
 
 # permissions for NFC
     setprop ro.nfc.port "I2C"
@@ -377,6 +372,12 @@ service bdaddr /system/bin/bdaddr_read
     user root
     disabled
     oneshot
+
+service gpsd /system/bin/gpsd -c /system/etc/gps.xml
+    class main
+    socket gps seqpacket 0660 gps system
+    user gps
+    group system inet sdcard_rw
 
 # TVout
 service TvoutService_C /system/bin/bintvoutservice
