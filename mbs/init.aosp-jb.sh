@@ -11,6 +11,7 @@ cp /mbs/aosp-jb/init.smdk4210.rc /
 cp /mbs/aosp-jb/init.smdk4210.usb.rc /
 cp /mbs/aosp-jb/init.trace.rc /
 cp /mbs/aosp-jb/init.usb.rc /
+cp /mbs/aosp-jb/init.gps.rc /
 cp /mbs/aosp-jb/ueventd.rc /
 cp /mbs/aosp-jb/ueventd.smdk4210.rc /
 cp /mbs/aosp-jb/lpm.rc /
