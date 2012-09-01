@@ -45,6 +45,7 @@ on fs
     symlink /lib/modules/dhd.ko /system/lib/modules/dhd.ko
     symlink /lib/modules/j4fs.ko /system/lib/modules/j4fs.ko
     symlink /lib/modules/logger.ko /system/lib/modules/logger.ko
+    symlink /lib/modules/md4.ko /system/lib/modules/md4.ko
     symlink /lib/modules/ntfs.ko /system/lib/modules/ntfs.ko
     symlink /lib/modules/scsi_wait_scan.ko /system/lib/modules/scsi_wait_scan.ko
 
@@ -149,10 +150,6 @@ on post-fs-data
 
     chmod 0775 /data/log
     chmod 0775 /data/anr
-
-    chmod 0662 /dev/log/radio
-    chmod 0662 /dev/log/main
-    chmod 0662 /dev/log/event
 
 #panorama directory creation
     mkdir /data/pxtmpdir 0775
